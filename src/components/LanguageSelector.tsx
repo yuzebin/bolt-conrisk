@@ -10,19 +10,21 @@ const languages = [
 ];
 
 const LanguageSelector: React.FC = () => {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const closeDropdown = () => setIsOpen(false);
 
-  const handleLanguageChange = async (langCode: string) => {
-    await i18n.changeLanguage(langCode);
-    localStorage.setItem('i18nextLng', langCode);
+  const handleLanguageChange = (langCode: string) => {
+    i18n.changeLanguage(langCode);
     closeDropdown();
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const getCurrentLanguageName = () => {
+    const currentLang = languages.find(lang => lang.code === i18n.language);
+    return currentLang ? currentLang.name : languages[0].name;
+  };
 
   return (
     <div className="relative inline-block text-left">
@@ -34,7 +36,7 @@ const LanguageSelector: React.FC = () => {
         aria-haspopup="true"
       >
         <Globe className="h-5 w-5 mr-2" aria-hidden="true" />
-        <span className="hidden sm:inline">{currentLanguage.name}</span>
+        <span className="hidden sm:inline">{getCurrentLanguageName()}</span>
       </button>
 
       {isOpen && (
