@@ -2,11 +2,16 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { mkdir } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export async function getDb() {
+  // Ensure database directory exists
+  const dbDir = dirname(join(__dirname, 'database.sqlite'));
+  await mkdir(dbDir, { recursive: true });
+
   return open({
     filename: join(__dirname, 'database.sqlite'),
     driver: sqlite3.Database

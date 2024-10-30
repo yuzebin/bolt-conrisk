@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
+import LanguageSelector from './LanguageSelector';
 
 const Navbar = () => {
   return (
@@ -14,6 +15,7 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="flex items-center space-x-4">
+            <LanguageSelector />
             <Link
               to="/login"
               className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"

@@ -1,31 +1,34 @@
 import React from 'react';
 import { Shield, FileText, Bell, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const features = [
-  {
-    icon: <FileText className="h-6 w-6" />,
-    title: '智能合同管理',
-    description: '自动识别关键条款和重要日期，确保您不会错过任何重要事项。'
-  },
-  {
-    icon: <Bell className="h-6 w-6" />,
-    title: '智能提醒系统',
-    description: '及时提醒合同到期、付款和其他关键时间节点。'
-  },
-  {
-    icon: <TrendingUp className="h-6 w-6" />,
-    title: '风险分析',
-    description: '深度分析合同风险，提供专业的财务规划建议。'
-  },
-  {
-    icon: <Shield className="h-6 w-6" />,
-    title: '安全保障',
-    description: '企业级安全保护，确保您的合同数据安全无虞。'
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 const LandingPage = () => {
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: <FileText className="h-6 w-6" />,
+      title: t('landing.features.contractManagement.title', '智能合同管理'),
+      description: t('landing.features.contractManagement.description', '自动识别关键条款和重要日期，确保您不会错过任何重要事项。')
+    },
+    {
+      icon: <Bell className="h-6 w-6" />,
+      title: t('landing.features.alerts.title', '智能提醒系统'),
+      description: t('landing.features.alerts.description', '及时提醒合同到期、付款和其他关键时间节点。')
+    },
+    {
+      icon: <TrendingUp className="h-6 w-6" />,
+      title: t('landing.features.riskAnalysis.title', '风险分析'),
+      description: t('landing.features.riskAnalysis.description', '深度分析合同风险，提供专业的财务规划建议。')
+    },
+    {
+      icon: <Shield className="h-6 w-6" />,
+      title: t('landing.features.security.title', '安全保障'),
+      description: t('landing.features.security.description', '企业级安全保护，确保您的合同数据安全无虞。')
+    }
+  ];
+
   return (
     <div className="relative">
       {/* Hero Section */}
@@ -35,11 +38,11 @@ const LandingPage = () => {
             <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="sm:text-center lg:text-left">
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">智能合同风险</span>
-                  <span className="block text-indigo-600">管理系统</span>
+                  <span className="block">{t('landing.hero.title1', '智能合同风险')}</span>
+                  <span className="block text-indigo-600">{t('landing.hero.title2', '管理系统')}</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  让合同管理变得简单高效，帮助您的企业降低风险，提升效率。
+                  {t('landing.hero.description', '让合同管理变得简单高效，帮助您的企业降低风险，提升效率。')}
                 </p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   <div className="rounded-md shadow">
@@ -47,7 +50,7 @@ const LandingPage = () => {
                       to="/register"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
                     >
-                      立即开始
+                      {t('landing.hero.startButton', '立即开始')}
                     </Link>
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
@@ -55,7 +58,7 @@ const LandingPage = () => {
                       to="/login"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
                     >
-                      登录系统
+                      {t('landing.hero.loginButton', '登录系统')}
                     </Link>
                   </div>
                 </div>
@@ -67,7 +70,7 @@ const LandingPage = () => {
           <img
             className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
             src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-            alt="Contract Management"
+            alt={t('landing.hero.imageAlt', 'Contract Management')}
           />
         </div>
       </div>
@@ -76,9 +79,11 @@ const LandingPage = () => {
       <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">功能特点</h2>
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">
+              {t('landing.features.subtitle', '功能特点')}
+            </h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              更智能的合同管理方式
+              {t('landing.features.title', '更智能的合同管理方式')}
             </p>
           </div>
 

@@ -1,20 +1,23 @@
 import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LayoutDashboard, FileText, Users, Settings, Bell } from 'lucide-react';
+import LanguageSelector from './LanguageSelector';
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-const navigation = [
-  { name: '仪表盘', href: '/dashboard', icon: LayoutDashboard },
-  { name: '合同管理', href: '/contracts', icon: FileText },
-  { name: '组织管理', href: '/organization', icon: Users },
-  { name: '系统设置', href: '/settings', icon: Settings },
-];
-
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const navigation = [
+    { name: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard },
+    { name: t('nav.contracts'), href: '/contracts', icon: FileText },
+    { name: t('nav.organization'), href: '/organization', icon: Users },
+    { name: t('nav.settings'), href: '/settings', icon: Settings },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -54,11 +57,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
           <div className="flex-1 px-4 flex justify-end">
-            <div className="ml-4 flex items-center md:ml-6">
-              <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+            <div className="ml-4 flex items-center md:ml-6 space-x-4">
+              <LanguageSelector />
+              <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <span className="sr-only">View notifications</span>
                 <Bell className="h-6 w-6" />
               </button>
-              <div className="ml-3 relative">
+              <div className="relative">
                 <div className="flex items-center">
                   <img
                     className="h-8 w-8 rounded-full"

@@ -1,0 +1,53 @@
+{
+  "common": {
+    "login": "로그인",
+    "register": "회원가입",
+    "logout": "로그아웃",
+    "email": "이메일",
+    "password": "비밀번호",
+    "confirmPassword": "비밀번호 확인",
+    "submit": "제출",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "search": "검색",
+    "loading": "로딩 중..."
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "contracts": "계약 관리",
+    "organization": "조직 관리",
+    "settings": "시스템 설정"
+  },
+  "auth": {
+    "loginTitle": "계정에 로그인",
+    "registerTitle": "새 계정 만들기",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "rememberMe": "로그인 상태 유지",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "activeContracts": "활성 계약",
+    "riskAlerts": "위험 알림",
+    "pendingReviews": "검토 대기",
+    "monthlyNew": "이번 달 신규"
+  },
+  "contracts": {
+    "title": "계약 관리",
+    "upload": "계약 업로드",
+    "analysis": "계약 분석",
+    "status": {
+      "active": "진행 중",
+      "completed": "완료",
+      "terminated": "종료"
+    },
+    "risk": {
+      "high": "고위험",
+      "medium": "중위험",
+      "low": "저위험"
+    }
+  }
+}

@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
+    "docker:dev": "bash scripts/docker-dev.sh",
+    "docker:deploy": "bash scripts/docker-deploy.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,14 +19,21 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.1",
     "express-validator": "^7.0.1",
+    "i18next": "^23.10.1",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "i18next-http-backend": "^2.5.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.344.0",
     "multer": "^1.4.5-lts.1",
+    "natural": "^6.10.5",
+    "pdf-parse": "^1.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^14.1.0",
     "react-router-dom": "^6.22.3",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "word-extractor": "^1.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

@@ -1,0 +1,53 @@
+{
+  "common": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading..."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "contracts": "Contracts",
+    "organization": "Organization",
+    "settings": "Settings"
+  },
+  "auth": {
+    "loginTitle": "Sign in to your account",
+    "registerTitle": "Create a new account",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activeContracts": "Active Contracts",
+    "riskAlerts": "Risk Alerts",
+    "pendingReviews": "Pending Reviews",
+    "monthlyNew": "New This Month"
+  },
+  "contracts": {
+    "title": "Contract Management",
+    "upload": "Upload Contract",
+    "analysis": "Contract Analysis",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "terminated": "Terminated"
+    },
+    "risk": {
+      "high": "High Risk",
+      "medium": "Medium Risk",
+      "low": "Low Risk"
+    }
+  }
+}

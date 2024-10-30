@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import { Upload, File, X, Plus, Calendar, DollarSign, Users } from 'lucide-react';
+import config from '../config';
 
 interface ContractParty {
   name: string;
@@ -79,7 +80,7 @@ const ContractUpload = () => {
       formDataToSend.append('value', formData.value);
       formDataToSend.append('parties', JSON.stringify(formData.parties));
 
-      const response = await fetch('http://localhost:3000/api/contracts', {
+      const response = await fetch(`${config.apiUrl}/api/contracts`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

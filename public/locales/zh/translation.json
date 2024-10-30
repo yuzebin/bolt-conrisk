@@ -1,0 +1,53 @@
+{
+  "common": {
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "submit": "提交",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "loading": "加载中..."
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "contracts": "合同管理",
+    "organization": "组织管理",
+    "settings": "系统设置"
+  },
+  "auth": {
+    "loginTitle": "登录您的账户",
+    "registerTitle": "注册新账户",
+    "forgotPassword": "忘记密码？",
+    "rememberMe": "记住我",
+    "noAccount": "还没有账户？",
+    "hasAccount": "已有账户？"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "activeContracts": "活跃合同",
+    "riskAlerts": "风险提醒",
+    "pendingReviews": "待审合同",
+    "monthlyNew": "本月新增"
+  },
+  "contracts": {
+    "title": "合同管理",
+    "upload": "上传合同",
+    "analysis": "合同分析",
+    "status": {
+      "active": "进行中",
+      "completed": "已完成",
+      "terminated": "已终止"
+    },
+    "risk": {
+      "high": "高风险",
+      "medium": "中风险",
+      "low": "低风险"
+    }
+  }
+}

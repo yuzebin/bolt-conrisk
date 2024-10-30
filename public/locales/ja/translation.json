@@ -1,0 +1,53 @@
+{
+  "common": {
+    "login": "ログイン",
+    "register": "登録",
+    "logout": "ログアウト",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "search": "検索",
+    "loading": "読み込み中..."
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "contracts": "契約管理",
+    "organization": "組織管理",
+    "settings": "システム設定"
+  },
+  "auth": {
+    "loginTitle": "アカウントにログイン",
+    "registerTitle": "新規アカウント作成",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "rememberMe": "ログイン状態を保持",
+    "noAccount": "アカウントをお持ちでない方",
+    "hasAccount": "既にアカウントをお持ちの方"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "activeContracts": "アクティブな契約",
+    "riskAlerts": "リスクアラート",
+    "pendingReviews": "レビュー待ち",
+    "monthlyNew": "今月の新規"
+  },
+  "contracts": {
+    "title": "契約管理",
+    "upload": "契約アップロード",
+    "analysis": "契約分析",
+    "status": {
+      "active": "進行中",
+      "completed": "完了",
+      "terminated": "終了"
+    },
+    "risk": {
+      "high": "高リスク",
+      "medium": "中リスク",
+      "low": "低リスク"
+    }
+  }
+}

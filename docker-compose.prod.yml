@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - contract_uploads:/app/server/uploads
+      - sqlite_data:/app/server/database
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - VITE_API_URL=http://107.173.168.46:3000
+    restart: unless-stopped
+
+volumes:
+  contract_uploads:
+  sqlite_data:

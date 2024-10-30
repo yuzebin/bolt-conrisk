@@ -3,9 +3,14 @@ import multer from 'multer';
 import { body, param } from 'express-validator';
 import { authenticateToken } from '../middleware/auth.js';
 import { getDb } from '../database/init.js';
+import { analyzeContract } from '../services/contractAnalysis.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { createReadStream } from 'fs';
+import { promisify } from 'util';
+import { pipeline } from 'stream';
 
+const streamPipeline = promisify(pipeline);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -22,14 +27,39 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Accept only PDF and Word documents
+    if (file.mimetype === 'application/pdf' || 
+        file.mimetype === 'application/msword' ||
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      cb(null, true);
+    } else {
+      cb(new Error('不支持的文件格式'));
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 // Get all contracts for organization
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const db = await getDb();
     const contracts = await db.all(
-      `SELECT * FROM contracts WHERE organization_id = ? ORDER BY created_at DESC`,
+      `SELECT 
+        c.*,
+        GROUP_CONCAT(DISTINCT cp.party_name) as parties,
+        COUNT(DISTINCT ra.id) as risk_count,
+        MAX(CASE WHEN ra.risk_level = 'high' THEN 1 ELSE 0 END) as has_high_risk
+       FROM contracts c
+       LEFT JOIN contract_parties cp ON c.id = cp.contract_id
+       LEFT JOIN risk_assessments ra ON c.id = ra.contract_id
+       WHERE c.organization_id = ?
+       GROUP BY c.id
+       ORDER BY c.created_at DESC`,
       [req.user.organization_id]
     );
 
@@ -40,7 +70,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get contract details
+// Get contract details with analysis
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const db = await getDb();
@@ -61,21 +91,30 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
     // Get risk assessments
     const risks = await db.all(
-      'SELECT * FROM risk_assessments WHERE contract_id = ?',
+      'SELECT * FROM risk_assessments WHERE contract_id = ? ORDER BY risk_level DESC',
       [contract.id]
     );
 
     // Get key dates
     const keyDates = await db.all(
-      'SELECT * FROM key_dates WHERE contract_id = ?',
+      'SELECT * FROM key_dates WHERE contract_id = ? ORDER BY event_date ASC',
       [contract.id]
     );
+
+    // Calculate risk statistics
+    const riskStats = {
+      total: risks.length,
+      high: risks.filter(r => r.risk_level === 'high').length,
+      medium: risks.filter(r => r.risk_level === 'medium').length,
+      low: risks.filter(r => r.risk_level === 'low').length
+    };
 
     res.json({
       ...contract,
       parties,
       risks,
-      keyDates
+      keyDates,
+      riskStats
     });
   } catch (err) {
     console.error(err);
@@ -83,7 +122,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Upload contract
+// Upload and analyze contract
 router.post('/',
   authenticateToken,
   upload.single('file'),
@@ -103,6 +142,10 @@ router.post('/',
         value,
         parties
       } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ message: '请上传合同文件' });
+      }
 
       const db = await getDb();
 
@@ -126,21 +169,35 @@ router.post('/',
           startDate,
           endDate,
           value,
-          req.file ? req.file.path : null
+          req.file.path
         ]
       );
 
       // Add contract parties
-      for (const party of parties) {
+      const parsedParties = JSON.parse(parties);
+      for (const party of parsedParties) {
         await db.run(
           'INSERT INTO contract_parties (contract_id, party_name, party_type) VALUES (?, ?, ?)',
           [result.lastID, party.name, party.type]
         );
       }
 
+      // Read and analyze contract content
+      const fileContent = await new Promise((resolve, reject) => {
+        let content = '';
+        const readStream = createReadStream(req.file.path, 'utf8');
+        readStream.on('data', chunk => content += chunk);
+        readStream.on('end', () => resolve(content));
+        readStream.on('error', reject);
+      });
+
+      // Analyze contract
+      const analysis = await analyzeContract(result.lastID, fileContent);
+
       res.status(201).json({
         id: result.lastID,
         number: contractNumber,
+        analysis,
         message: '合同上传成功'
       });
     } catch (err) {
