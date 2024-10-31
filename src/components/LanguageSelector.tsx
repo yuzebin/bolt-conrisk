@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 
 const languages = [
-  { code: 'en', name: 'English' },
   { code: 'zh', name: '中文' },
+  { code: 'en', name: 'English' },
   { code: 'ko', name: '한국어' },
   { code: 'ja', name: '日本語' },
 ];
@@ -12,18 +12,36 @@ const languages = [
 const LanguageSelector: React.FC = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language?.split('-')[0] || 'zh');
+
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setCurrentLang(lng.split('-')[0]);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const closeDropdown = () => setIsOpen(false);
 
-  const handleLanguageChange = (langCode: string) => {
-    i18n.changeLanguage(langCode);
-    closeDropdown();
+  const handleLanguageChange = async (langCode: string) => {
+    try {
+      await i18n.changeLanguage(langCode);
+      document.documentElement.lang = langCode;
+      localStorage.setItem('i18nextLng', langCode);
+      closeDropdown();
+    } catch (error) {
+      console.error('Failed to change language:', error);
+    }
   };
 
   const getCurrentLanguageName = () => {
-    const currentLang = languages.find(lang => lang.code === i18n.language);
-    return currentLang ? currentLang.name : languages[0].name;
+    const lang = languages.find(lang => lang.code === currentLang) || languages[0];
+    return lang.name;
   };
 
   return (
@@ -58,7 +76,7 @@ const LanguageSelector: React.FC = () => {
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
                   className={`${
-                    i18n.language === language.code
+                    currentLang === language.code
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-700'
                   } flex w-full items-center px-4 py-2 text-sm hover:bg-gray-50`}

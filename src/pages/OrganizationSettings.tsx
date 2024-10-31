@@ -1,61 +1,179 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { Users, UserPlus, Mail, Building, Trash2, PencilLine } from 'lucide-react';
+import { Users, UserPlus, Mail, Building, Trash2, PencilLine, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import config from '../config';
 
 interface TeamMember {
   id: number;
   name: string;
   email: string;
   role: string;
-  avatar: string;
+}
+
+interface Organization {
+  id: number;
+  name: string;
+  members: TeamMember[];
 }
 
 const OrganizationSettings = () => {
-  const [orgName, setOrgName] = useState('示例公司');
+  const { t } = useTranslation();
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberRole, setNewMemberRole] = useState('member');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [teamMembers] = useState<TeamMember[]>([
-    {
-      id: 1,
-      name: '张三',
-      email: 'zhangsan@example.com',
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-    {
-      id: 2,
-      name: '李四',
-      email: 'lisi@example.com',
-      role: 'member',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-  ]);
+  useEffect(() => {
+    fetchOrganizationData();
+  }, []);
 
-  const handleOrgNameSubmit = (e: React.FormEvent) => {
+  const fetchOrganizationData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/api/organizations`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('获取组织信息失败');
+      }
+
+      const data = await response.json();
+      setOrganization(data);
+      setNewName(data.name);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取组织信息失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOrgNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsEditing(false);
-    // TODO: Implement organization name update logic
+    setError('');
+    
+    try {
+      setIsSubmitting(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/api/organizations`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newName })
+      });
+
+      if (!response.ok) {
+        throw new Error('更新组织名称失败');
+      }
+
+      setOrganization(prev => prev ? { ...prev, name: newName } : null);
+      setIsEditing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '更新失败，请重试');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleInviteMember = (e: React.FormEvent) => {
+  const handleInviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement member invitation logic
-    console.log('Inviting member:', { email: newMemberEmail, role: newMemberRole });
-    setNewMemberEmail('');
-    setNewMemberRole('member');
+    setError('');
+
+    try {
+      setIsSubmitting(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/api/organizations/members`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: newMemberEmail,
+          role: newMemberRole
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('邀请成员失败');
+      }
+
+      await fetchOrganizationData();
+      setNewMemberEmail('');
+      setNewMemberRole('member');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '邀请失败，请重试');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleRemoveMember = (memberId: number) => {
-    // TODO: Implement member removal logic
-    console.log('Removing member:', memberId);
+  const handleRemoveMember = async (memberId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/api/organizations/members/${memberId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('删除成员失败');
+      }
+
+      await fetchOrganizationData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '删除失败，请重试');
+    }
   };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!organization) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-12">
+          <h3 className="mt-2 text-sm font-medium text-gray-900">无法加载组织信息</h3>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-gray-900">组织设置</h1>
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">{error}</h3>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Organization Info */}
         <div className="bg-white shadow rounded-lg p-6">
@@ -68,20 +186,22 @@ const OrganizationSettings = () => {
                   <form onSubmit={handleOrgNameSubmit} className="flex items-center space-x-2">
                     <input
                       type="text"
-                      value={orgName}
-                      onChange={(e) => setOrgName(e.target.value)}
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
                       className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      required
                     />
                     <button
                       type="submit"
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400"
                     >
                       保存
                     </button>
                   </form>
                 ) : (
                   <>
-                    <span className="text-lg font-medium text-gray-900">{orgName}</span>
+                    <span className="text-lg font-medium text-gray-900">{organization.name}</span>
                     <button
                       onClick={() => setIsEditing(true)}
                       className="text-gray-400 hover:text-gray-500"
@@ -100,7 +220,7 @@ const OrganizationSettings = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium text-gray-900">团队成员</h2>
             <span className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded-full">
-              {teamMembers.length} 名成员
+              {organization.members.length} 名成员
             </span>
           </div>
 
@@ -122,6 +242,7 @@ const OrganizationSettings = () => {
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="输入邮箱地址邀请成员"
+                    required
                   />
                 </div>
               </div>
@@ -135,7 +256,8 @@ const OrganizationSettings = () => {
               </select>
               <button
                 type="submit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                disabled={isSubmitting}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400"
               >
                 <UserPlus className="h-5 w-5 mr-2" />
                 邀请
@@ -145,16 +267,16 @@ const OrganizationSettings = () => {
 
           {/* Members List */}
           <ul className="divide-y divide-gray-200">
-            {teamMembers.map((member) => (
+            {organization.members.map((member) => (
               <li key={member.id} className="py-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <img
-                    className="h-10 w-10 rounded-full"
-                    src={member.avatar}
-                    alt={member.name}
-                  />
+                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-lg font-medium text-gray-600">
+                      {member.name ? member.name[0].toUpperCase() : member.email[0].toUpperCase()}
+                    </span>
+                  </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">{member.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{member.name || member.email}</p>
                     <p className="text-sm text-gray-500">{member.email}</p>
                   </div>
                 </div>

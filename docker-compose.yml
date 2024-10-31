@@ -15,7 +15,7 @@ services:
       - sqlite_data:/app/server/database
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://107.173.168.46:3000
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
       - HOST=0.0.0.0
     command: npm run dev:all
 

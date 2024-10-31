@@ -2,8 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
+  const { t } = useTranslation();
+
   return (
     <nav className="bg-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,13 +23,13 @@ const Navbar = () => {
               to="/login"
               className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
             >
-              登录
+              {t('common.login')}
             </Link>
             <Link
               to="/register"
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
             >
-              注册
+              {t('common.register')}
             </Link>
           </div>
         </div>
