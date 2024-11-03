@@ -4,25 +4,35 @@ import DashboardLayout from '../components/DashboardLayout';
 import { Calendar, DollarSign, Users, AlertCircle } from 'lucide-react';
 import config from '../config';
 
-interface ContractAnalysis {
+interface ContractForm {
   title: string;
+  number: string;
   startDate: string;
   endDate: string;
-  value: number;
-  parties: { name: string; type: string }[];
+  value: string;
+  firstParty: string;
+  secondParty: string;
 }
 
 interface LocationState {
   fileId: string;
-  analysis: ContractAnalysis;
+  originalFilename: string;
 }
 
 const ContractConfirm = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { fileId, analysis } = location.state as LocationState;
+  const { fileId, originalFilename } = location.state as LocationState;
 
-  const [formData, setFormData] = useState<ContractAnalysis>(analysis);
+  const [formData, setFormData] = useState<ContractForm>({
+    title: '',
+    number: '',
+    startDate: '',
+    endDate: '',
+    value: '',
+    firstParty: '',
+    secondParty: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -51,7 +61,7 @@ const ContractConfirm = () => {
       }
 
       const data = await response.json();
-      navigate(`/contracts/${data.id}/analysis`);
+      navigate(`/contracts/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : '提交失败，请重试');
     } finally {
@@ -59,10 +69,18 @@ const ContractConfirm = () => {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-gray-900">确认合同信息</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">填写合同信息</h1>
 
         {error && (
           <div className="rounded-md bg-red-50 p-4">
@@ -87,8 +105,24 @@ const ContractConfirm = () => {
                 <input
                   type="text"
                   id="title"
+                  name="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="number" className="block text-sm font-medium text-gray-700">
+                  合同编号
+                </label>
+                <input
+                  type="text"
+                  id="number"
+                  name="number"
+                  value={formData.number}
+                  onChange={handleChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   required
                 />
@@ -105,8 +139,9 @@ const ContractConfirm = () => {
                   <input
                     type="number"
                     id="value"
+                    name="value"
                     value={formData.value}
-                    onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
+                    onChange={handleChange}
                     className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
@@ -124,8 +159,9 @@ const ContractConfirm = () => {
                   <input
                     type="date"
                     id="startDate"
+                    name="startDate"
                     value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    onChange={handleChange}
                     className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
@@ -143,8 +179,9 @@ const ContractConfirm = () => {
                   <input
                     type="date"
                     id="endDate"
+                    name="endDate"
                     value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    onChange={handleChange}
                     className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
@@ -156,30 +193,45 @@ const ContractConfirm = () => {
             <div className="mt-6">
               <h3 className="text-sm font-medium text-gray-700 mb-3">签约方</h3>
               <div className="space-y-4">
-                {formData.parties.map((party, index) => (
-                  <div key={index} className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <label className="sr-only">公司名称</label>
-                      <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Users className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          value={party.name}
-                          onChange={(e) => {
-                            const newParties = [...formData.parties];
-                            newParties[index] = { ...party, name: e.target.value };
-                            setFormData({ ...formData, parties: newParties });
-                          }}
-                          className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          placeholder={`${party.type === 'first_party' ? '甲方' : '乙方'}名称`}
-                          required
-                        />
-                      </div>
+                <div>
+                  <label htmlFor="firstParty" className="block text-sm font-medium text-gray-700">
+                    甲方
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Users className="h-5 w-5 text-gray-400" />
                     </div>
+                    <input
+                      type="text"
+                      id="firstParty"
+                      name="firstParty"
+                      value={formData.firstParty}
+                      onChange={handleChange}
+                      className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      required
+                    />
                   </div>
-                ))}
+                </div>
+
+                <div>
+                  <label htmlFor="secondParty" className="block text-sm font-medium text-gray-700">
+                    乙方
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Users className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      id="secondParty"
+                      name="secondParty"
+                      value={formData.secondParty}
+                      onChange={handleChange}
+                      className="block w-full pl-10 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -197,7 +249,7 @@ const ContractConfirm = () => {
               disabled={isSubmitting}
               className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? '提交中...' : '确认创建'}
+              {isSubmitting ? '提交中...' : '保存合同'}
             </button>
           </div>
         </form>

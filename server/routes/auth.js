@@ -4,15 +4,8 @@ import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import { getDb } from '../database/init.js';
 import { authenticateToken } from '../middleware/auth.js';
-import cors from 'cors';
 
 const router = express.Router();
-
-// 配置 CORS
-router.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
 
 // Login
 router.post('/login',
@@ -70,7 +63,7 @@ router.post('/login',
 
       // Send response
       res.json({
-        token, // 为了向后兼容，仍然在响应中包含 token
+        token,
         user: {
           id: user.id,
           name: user.name,

@@ -1,9 +1,9 @@
 import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { mkdir } from 'fs/promises';
+import corsMiddleware from './middleware/cors.js';
 import authRoutes from './routes/auth.js';
 import contractRoutes from './routes/contracts.js';
 import organizationRoutes from './routes/organizations.js';
@@ -22,8 +22,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || 'localhost';
 
+// Apply CORS middleware
+app.use(corsMiddleware);
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(join(__dirname, 'uploads')));
 

@@ -1,11 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  
+  // Check if user is on a dashboard page
+  const isDashboardPage = location.pathname.startsWith('/dashboard') || 
+                         location.pathname.startsWith('/contracts') || 
+                         location.pathname.startsWith('/organization');
+
+  // Don't show the public navbar on dashboard pages
+  if (isDashboardPage) {
+    return null;
+  }
 
   return (
     <nav className="bg-white shadow-lg">

@@ -2,16 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import { Upload, File, X, AlertCircle } from 'lucide-react';
-import AnalysisProgress from '../components/AnalysisProgress';
 import config from '../config';
-
-interface ContractAnalysis {
-  title: string;
-  startDate: string;
-  endDate: string;
-  value: number;
-  parties: { name: string; type: string }[];
-}
 
 const ContractUpload = () => {
   const navigate = useNavigate();
@@ -19,8 +10,6 @@ const ContractUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
-  const [analysisStatus, setAnalysisStatus] = useState<'pending' | 'processing' | 'completed' | 'error'>('pending');
-  const [analysisProgress, setAnalysisProgress] = useState(0);
 
   const validateFile = useCallback((file: File) => {
     const validTypes = [
@@ -67,28 +56,29 @@ const ContractUpload = () => {
     }
   }, []);
 
-  const handleFileSelection = async (selectedFile: File) => {
+  const handleFileSelection = (selectedFile: File) => {
     setError('');
     try {
       validateFile(selectedFile);
       setFile(selectedFile);
-      await uploadAndAnalyze(selectedFile);
     } catch (err) {
       setError(err instanceof Error ? err.message : '文件处理失败');
       setFile(null);
     }
   };
 
-  const uploadAndAnalyze = async (selectedFile: File) => {
+  const handleUpload = async () => {
+    if (!file) return;
+
     try {
       setIsUploading(true);
-      setAnalysisStatus('processing');
+      setError('');
       const token = localStorage.getItem('token');
       
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append('file', file);
 
-      const response = await fetch(`${config.apiUrl}/api/contracts/analyze`, {
+      const response = await fetch(`${config.apiUrl}/api/contracts/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -98,23 +88,20 @@ const ContractUpload = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || '合同分析失败');
+        throw new Error(errorData.message || '上传失败');
       }
 
       const data = await response.json();
-      setAnalysisStatus('completed');
-
-      // 自动跳转到确认页面
+      
+      // Navigate to contract form page with file info
       navigate('/contracts/confirm', { 
         state: { 
           fileId: data.fileId,
-          originalFilename: data.originalFilename,
-          analysis: data.analysis
+          originalFilename: data.originalFilename
         }
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '上传失败，请重试');
-      setAnalysisStatus('error');
     } finally {
       setIsUploading(false);
     }
@@ -185,14 +172,25 @@ const ContractUpload = () => {
           )}
         </div>
 
-        {/* Analysis Progress */}
+        {/* Action Buttons */}
         {file && (
-          <div className="max-w-3xl">
-            <AnalysisProgress
-              status={analysisStatus}
-              progress={analysisProgress}
-              error={error}
-            />
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => setFile(null)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={isUploading}
+            >
+              重新选择
+            </button>
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={isUploading}
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+            >
+              {isUploading ? '上传中...' : '上传文件'}
+            </button>
           </div>
         )}
       </div>

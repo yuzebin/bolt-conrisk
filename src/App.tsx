@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from './components/Navbar';
@@ -22,31 +22,28 @@ const LoadingFallback = () => (
 function App() {
   const { i18n } = useTranslation();
 
-  useEffect(() => {
-    // 设置文档语言
+  React.useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <BrowserRouter>
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/contracts" element={<ContractList />} />
-            <Route path="/contracts/upload" element={<ContractUpload />} />
-            <Route path="/contracts/confirm" element={<ContractConfirm />} />
-            <Route path="/contracts/:id/analysis" element={<ContractAnalysis />} />
-            <Route path="/organization" element={<OrganizationSettings />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </Suspense>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/contracts" element={<ContractList />} />
+          <Route path="/contracts/upload" element={<ContractUpload />} />
+          <Route path="/contracts/confirm" element={<ContractConfirm />} />
+          <Route path="/contracts/:id/analysis" element={<ContractAnalysis />} />
+          <Route path="/organization" element={<OrganizationSettings />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
